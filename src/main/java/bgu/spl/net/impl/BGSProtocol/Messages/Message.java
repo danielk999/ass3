@@ -8,5 +8,5 @@ public interface Message {
 
     public String toString();
 
-    public void procses(int connectionId, Connections connections, Inventory inventory);
+    public boolean procses(int connectionId, Connections connections, Inventory inventory);
 }

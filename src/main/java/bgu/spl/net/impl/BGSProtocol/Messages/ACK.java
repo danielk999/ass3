@@ -44,14 +44,17 @@ public class ACK implements Message {
                 break;
             case 7:
             case 4:
-                optional = new byte[Integer.parseInt(Optional[0]) + 1][];
+                optional = new byte[Optional.length][];
                 optional[0] = shortToBytes(Short.parseShort(Optional[0]));
-                int poss = 1;
-                for (int i = 3; i < Optional.length; i++) {
-                    optional[poss++] = (Optional[i] + '\0').getBytes();
+                for (int i = 1; i < Optional.length; i++) {
+                    optional[i] = (Optional[i] + '\0').getBytes();
                 }
         }
-        byte[] toReturn = new byte[ACopcode.length + MGopcode.length + optional.length];
+        int length=0;
+        for(int i=0;i<optional.length;i++){
+            length+=optional[i].length;
+        }
+        byte[] toReturn = new byte[ACopcode.length + MGopcode.length + length];
         int poss = 0;
         for (int i = 0; i < ACopcode.length; i++) {
             toReturn[poss++] = ACopcode[i];
@@ -80,16 +83,17 @@ public class ACK implements Message {
     @Override
     public String toString() {
         String s = "ACK" + " " + MsOpcode + " ";
-        if (Optional.length != 0) {
-            s += Optional.length;
+        if (Optional != null) {
+            //s += Optional.length;
             for (int i = 0; i < Optional.length; i++) {
-                s += (Optional + " ");
+                s += (Optional[i] + " ");
             }
         }
         return s.substring(0, s.length() - 1);
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
+        return false;
     }
 }

@@ -41,7 +41,7 @@ public class Login implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
         boolean reualt = inventory.Login(userName, password,connectionId);
         if (reualt) {
             connections.send(connectionId, new ACK((short) 2, null));
@@ -55,9 +55,11 @@ public class Login implements Message {
                 c.removeFirstMessages();
                 message=c.getFirstMessages();
             }
+            return true;
         }
         else {
             connections.send(connectionId, new Error((short) 2));
+            return false;
         }
     }
 }

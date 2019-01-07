@@ -33,13 +33,12 @@ public class Post implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
         Client me = inventory.exists(connectionId);
         if (me == null) {
             connections.send(connectionId, new Error((short) 5));
-        } else if (!inventory.isConnected(me.getUserName())) {
-            connections.send(connectionId, new Error((short) 5));
-        } else {
+            return false;
+        }else {
             List<Client> clients = inventory.getUsers();
             String[] users = content.split(" ");
             List<String> specificUser = new LinkedList<>();
@@ -57,6 +56,7 @@ public class Post implements Message {
             }
             connections.send(connectionId, new ACK((short) 5, null));
             me.addPost(content);
+            return true;
         }
     }
 }

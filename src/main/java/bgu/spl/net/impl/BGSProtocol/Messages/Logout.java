@@ -17,13 +17,15 @@ public class Logout implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
         boolean resualt = inventory.Logout(connectionId);
         if (resualt) {
             connections.send(connectionId, new ACK((short) 3, null));
             connections.disconnect(connectionId);
+            return true;
         } else {
             connections.send(connectionId, new Error((short) 3));
+            return false;
         }
     }
 }

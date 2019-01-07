@@ -75,6 +75,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
 
     public void close() {
         try {
+            if (writeQueue.isEmpty())
             chan.close();
         } catch (IOException ex) {
             ex.printStackTrace();

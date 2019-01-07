@@ -24,8 +24,10 @@ public class BGS implements BidiMessagingProtocol<Message> {
 
     @Override
     public void process(Message message) {
-        message.procses(connectionId, connections, inventory);
-        shouldTerminate = (message instanceof Logout);
+        boolean b=message.procses(connectionId, connections, inventory);
+        if(b & message instanceof Logout){
+            shouldTerminate=true;
+        }
     }
 
     @Override

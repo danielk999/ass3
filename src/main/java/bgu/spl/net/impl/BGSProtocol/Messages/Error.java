@@ -33,7 +33,7 @@ public class Error implements Message {
 
     @Override
     public byte[] encode() {
-        byte[] ERopcode = shortToBytes((short) 10);
+        byte[] ERopcode = shortToBytes((short) 11);
         byte[] MGopcode = shortToBytes(MsOpcode);
         byte[] toReturn = new byte[ERopcode.length + MGopcode.length];
         int poss = 0;
@@ -54,6 +54,7 @@ public class Error implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
+        return false;
     }
 }

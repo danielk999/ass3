@@ -20,20 +20,21 @@ public class UserList implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
         List<Client> registerd = inventory.getUsers();
         String[] users;
         Client me = inventory.exists(connectionId);
         if (me == null) {
             connections.send(connectionId, new Error((short) 7));
-        } else if (!inventory.isConnected(me.getUserName())) {
-            connections.send(connectionId, new Error((short) 7));
+            return false;
         } else {
-            users = new String[registerd.size()];
-            for (int i = 0; i < registerd.size(); i++) {
-                users[i] = registerd.get(i).getUserName();
+            users = new String[registerd.size()+1];
+            users[0]=""+registerd.size();
+            for (int i = 1; i < users.length; i++) {
+                users[i] = registerd.get(i-1).getUserName();
             }
             connections.send(connectionId, new ACK((short) 7, users));
+            return true;
         }
     }
 }

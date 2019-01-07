@@ -41,12 +41,20 @@ public class Register implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
-        boolean b = inventory.Add(new Client(userName, password));
-        if (b) {
-            connections.send(connectionId, new ACK((short) 1, null));
-        } else {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
+        Client c=inventory.exists(connectionId);
+        if(c!=null){
             connections.send(connectionId, new Error((short) 1));
+            return false;
+        }else {
+            boolean b = inventory.Add(userName, password);
+            if (b) {
+                connections.send(connectionId, new ACK((short) 1, null));
+                return true;
+            } else {
+                connections.send(connectionId, new Error((short) 1));
+                return false;
+            }
         }
     }
 }

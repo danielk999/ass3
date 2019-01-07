@@ -13,7 +13,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     private ConcurrentHashMap<Integer, ConnectionHandler<T>> idmap = new ConcurrentHashMap<>();
     private int id = 1;
-    private Object lock;
+    private Object lock=new Object();
 
     public ConnectionsImpl() {
     }
@@ -22,9 +22,10 @@ public class ConnectionsImpl<T> implements Connections<T> {
     public boolean send(int connectionId, T msg) {
         ConnectionHandler<T> handler = find(connectionId);
         if (handler != null) {
-            synchronized (handler) {
+             synchronized (handler) {
                 handler.send(msg);
             }
+            System.out.println(msg.toString());
             return true;
         } else {
             return false;

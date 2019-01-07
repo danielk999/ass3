@@ -78,6 +78,7 @@ public class Notification implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
+        return false;
     }
 }

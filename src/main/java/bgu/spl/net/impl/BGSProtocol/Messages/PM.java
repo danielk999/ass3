@@ -4,6 +4,8 @@ import bgu.spl.net.api.bidi.*;
 import bgu.spl.net.impl.BGSProtocol.Client;
 import bgu.spl.net.impl.BGSProtocol.Inventory;
 
+import java.util.List;
+
 public class PM implements Message {
     private final int opcode = 6;
     private String userName;
@@ -41,22 +43,29 @@ public class PM implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
         Client me = inventory.exists(connectionId);
-        Client other = inventory.exists(inventory.ConnectionId(userName));
+        Client other = null;
+        List<Client> users=inventory.getUsers();
+        for(int i =0;i<users.size();i++){
+            if(users.get(i).getUserName().equals(userName)){
+                other=users.get(i);
+            }
+        }
         if (me == null) {
             connections.send(connectionId, new Error((short) 6));
-        } else if (!inventory.isConnected(me.getUserName())) {
+            return false;
+        }  else if (other == null) {
             connections.send(connectionId, new Error((short) 6));
-        } else if (other == null) {
-            connections.send(connectionId, new Error((short) 6));
+            return false;
         } else {
             if (inventory.isConnected(other) &&
-                    connections.send(inventory.ConnectionId(other.getUserName()), new Notification(1, me.getUserName(), content))) {
+                    connections.send(inventory.ConnectionId(other.getUserName()), new Notification(0, me.getUserName(), content))) {
             } else {
                 other.addMessage(me.getUserName(), content, 0);
             }
+            connections.send(connectionId, new ACK((short) 6, null));
+            return true;
         }
-        connections.send(connectionId, new ACK((short) 6, null));
     }
 }

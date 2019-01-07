@@ -16,10 +16,16 @@ public class Inventory {
         connectedUsers = new ConcurrentHashMap<>();
     }
 
-    public boolean Add(Client c) {
-        if (!users.contains(c)) {
-            synchronized (users) {
-                users.add(c);
+    public boolean Add(String userName, String pass) {
+        Client c = null;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUserName().equals(userName))
+                c = users.get(i);
+        }
+        if(c==null){
+            Client nc=new Client(userName,pass);
+            synchronized (users){
+                users.add(nc);
             }
             return true;
         }
@@ -29,13 +35,13 @@ public class Inventory {
     public boolean Login(String userName, String pass,int connectionId) {
         Client c = null;
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getUserName() == userName & users.get(i).getPassword() == pass)
+            if (users.get(i).getUserName().equals(userName) & users.get(i).getPassword().equals(pass))
                 c = users.get(i);
         }
         if (c == null) {
             return false;
         } else {
-            if (connectedUsers.contains(c))
+            if (connectedUsers.containsKey(connectionId) | connectedUsers.contains(c))
                 return false;
         }
         connectedUsers.put(connectionId,c);
@@ -45,25 +51,25 @@ public class Inventory {
     public boolean Logout(int connectionid) {
         Client c = null;
         c = connectedUsers.get(connectionid);
-        if (c != null) {
+        if (c == null) {
             return false;
         }
         connectedUsers.remove(connectionid);
         return true;
     }
 
-    public String[] follow(int connectionid, String[] users) {
+    public List<String> follow(int connectionid, String[] users) {
         Client c = null;
         c = connectedUsers.get(connectionid);
         List<String> usersToFollow = c.addFollowers(users);
-        return (String[]) usersToFollow.toArray();
+        return  usersToFollow;
     }
 
-    public String[] unfollow(int connectionid, String[] users) {
+    public List<String> unfollow(int connectionid, String[] users) {
         Client c = null;
         c = connectedUsers.get(connectionid);
         List<String> usersToFollow = c.removeFollowers(users);
-        return (String[]) usersToFollow.toArray();
+        return  usersToFollow;
     }
 
 
@@ -109,7 +115,7 @@ public class Inventory {
 
     private Client find(String userName) {
             for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).getUserName() == userName) {
+                if (users.get(i).getUserName().equals(userName)) {
                     return users.get(i);
                 }
             }

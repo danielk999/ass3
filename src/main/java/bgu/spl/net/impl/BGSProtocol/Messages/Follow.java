@@ -7,6 +7,7 @@ import bgu.spl.net.impl.BGSProtocol.Messages.Error;
 import bgu.spl.net.impl.BGSProtocol.Messages.Message;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Follow implements Message {
     private final int opcode = 4;
@@ -46,20 +47,34 @@ public class Follow implements Message {
     }
 
     @Override
-    public void procses(int connectionId, Connections connections, Inventory inventory) {
+    public boolean procses(int connectionId, Connections connections, Inventory inventory) {
         if (follow == 0) {
-            String[] usersToFollow = inventory.follow(connectionId, users);
-            if (usersToFollow.length == 0) {
+            List<String> temp = inventory.follow(connectionId, users);
+            String[] usersToFollow=new String[temp.size()+1];
+            usersToFollow[0]=""+temp.size();
+            for(int i=1;i<usersToFollow.length;i++){
+              usersToFollow[i]=temp.get(i-1);
+            }
+            if (temp.size() == 0) {
                 connections.send(connectionId, new Error((short) 4));
+                return false;
             } else {
                 connections.send(connectionId, new ACK((short) 4, usersToFollow));
+                return true;
             }
         } else {
-            String[] usersToUnfollow = inventory.unfollow(connectionId, users);
-            if (usersToUnfollow.length == 0) {
+            List<String> temp = inventory.unfollow(connectionId, users);
+            String[] usersToUnfollow=new String[temp.size()+1];
+            usersToUnfollow[0]=""+temp.size();
+            for(int i=1;i<usersToUnfollow.length;i++){
+                usersToUnfollow[i]=temp.get(i-1);
+            }
+            if (temp.size() == 0) {
                 connections.send(connectionId, new Error((short) 4));
+                return false;
             } else {
                 connections.send(connectionId, new ACK((short) 4, usersToUnfollow));
+                return true;
             }
         }
     }
